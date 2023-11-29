@@ -9,10 +9,10 @@ library(paletteer)
 
 
 # read data -----------------------------------
-f1 <- nc_open("../data/ModE-RA_ensmean_temp2_abs_1420-2009nc.sec")
-f2 <- nc_open("../data/ModE-RA_ensmean_totprec_abs_1420-2009nc.sec")
-LaNina <- unlist(read.table("../exercises/LaNinaYears.txt", header = T))
-ElNino <- unlist(read.table("../exercises/ElNinoYears.txt", header = T)) 
+f1 <- nc_open("../data_raw/ModE-RA_ensmean_temp2_abs_1420-2009.nc")
+f2 <- nc_open("../data_raw/ModE-RA_ensmean_totprec_abs_1420-2009.nc")
+LaNina <- unlist(read.table("../data_raw/LaNinaYears.txt", header = T))
+ElNino <- unlist(read.table("../data_raw/ElNinoYears.txt", header = T)) 
 
 time <- f1$dim[[1]]$vals
 lon <- f1$dim[[2]]$vals
