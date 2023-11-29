@@ -8,7 +8,7 @@ library(paletteer)
 #------------------------------------------------------------------------------
 
 
-# read data
+# read data -----------------------------------
 f1 <- nc_open("../data/ModE-RA_ensmean_temp2_abs_1420-2009nc.sec")
 f2 <- nc_open("../data/ModE-RA_ensmean_totprec_abs_1420-2009nc.sec")
 LaNina <- unlist(read.table("../exercises/LaNinaYears.txt", header = T))
@@ -18,14 +18,15 @@ time <- f1$dim[[1]]$vals
 lon <- f1$dim[[2]]$vals
 lat <- f1$dim[[3]]$vals
 
-## temp composites
+
+# temp composites -------------------------
 temp <- ncvar_get(f1,varid="temp2")
 temp2 <- array(temp,dim=c(length(lon),length(lat),12,length(time)/12))
 temp3 <- aperm(temp2,c(1,2,4,3))
 temp4 <- apply(temp3,c(1:3),mean)
 temp_mean <- apply(temp3, c(1,2), mean)
 
-## prec composites
+# prec composites --------------------------
 prec <- ncvar_get(f2,varid="totprec")
 prec2 <- array(prec,dim=c(length(lon),length(lat),12,length(time)/12))
 prec3 <- aperm(prec2,c(1,2,4,3)) # EINHEIT kg/m^2s
