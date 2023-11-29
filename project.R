@@ -194,6 +194,7 @@ filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,a
 
 # COMPOSITES TIMESERIES --------------------------------
 
+
 # Erstellen der Timeseries aus Mittelwerten für australien 
 # Range der Koordinaten:
 # S -30.52     -     -19.109
@@ -203,7 +204,7 @@ b = lon >= 123.11 & lon <= 142.34
 
 prec_time = data.frame(prec = apply(prec4[b,l,], 3, mean),
                        time = 1421:2008)
-plot(prec_time$time,prec_time$prec)
+plot(prec_time$time,prec_time$prec, type="l")
 
 ElNino <- sort(ElNino)
 time_cuts = data.frame("1425" = rep(NA,3),
