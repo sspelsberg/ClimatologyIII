@@ -306,12 +306,12 @@ time_cuts = data.frame("1425" = rep(NA,3),
                        "1998" = rep(NA,3))
 
 for (i in 1:length(ElNino)){
-  ind = which(prec_time$time == ElNino[i])
-  time_cuts[1,i] = prec_time$prec[ind]
-  time_cuts[2,i] = prec_time$prec[ind+1]
-  time_cuts[3,i] = prec_time$prec[ind+2]
-  # time_cuts[4,i] = prec_time$prec[ind+3]
-  # time_cuts[5,i] = prec_time$prec[ind+4]
+  ind = which(df_prec_time$yr == ElNino[i])
+  time_cuts[1,i] = df_prec_time$prec[ind]
+  time_cuts[2,i] = df_prec_time$prec[ind+1]
+  time_cuts[3,i] = df_prec_time$prec[ind+2]
+  # time_cuts[4,i] = df_prec_time$prec[ind+3]
+  # time_cuts[5,i] = df_prec_time$prec[ind+4]
 }
 
 par(mfrow=c(1,2))
