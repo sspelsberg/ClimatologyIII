@@ -6,12 +6,18 @@ library(ncdf4)
 library(maps)
 library(RColorBrewer)
 library(paletteer)
+library(tidyverse)
+library(ggplot2)
 
 # To Dos ----------------------------
 
 # 1) crop composite map to australia to visualize local precipitation effects
-# 2) do a bit prettier timeseries composites
-# 3) calculate own el nino index
+# 2) calculate own el nino index
+# 3) use other months for analysis
+
+# 4) figure out why there are 
+# --> negative precip values
+# --> mean temp values >300
 
 
 # read data -----------------------------------
@@ -29,13 +35,21 @@ lat <- f1$dim[[3]]$vals
 colnames(ElNino) <- "yr"
 colnames(LaNina) <- "yr"
 
-# select years 1800-2000
-selyrs <- c(380:580) # indices
-yrs <- c(1421:2008)
+# sort El Nino
+ElNino <- ElNino |> arrange(yr)
+LaNina <- LaNina |> arrange(yr)
 
-# select el nino/la nina indeces
+# select years 1800-2000
+yrs <- c(1421:2008)
+selyrs_1800 <- which(yrs < 1800)
+selyrs_2008 <- which(yrs >= 1800) # indices
+
+# select el nino/la nina indices
 selnino <- match(ElNino$yr,yrs)
 selnina <- match(LaNina$yr,yrs)
+selnino1800 <- selnino[selnino %in% selyrs_1800]
+selnino2008 <- selnino[selnino %in% selyrs_2008]
+
 
 
 # temp composites -------------------------
@@ -47,7 +61,7 @@ temp3 <- aperm(temp2, c(1,2,4,3))
 
 # compute annual mean 
 # for months: use temp3[,,,1:3]
-temp4 <- apply(temp3, c(1:3), mean) # annual mean for each cell
+temp4 <- apply(temp3[,,,1:12], c(1:3), mean) # annual mean for each cell
 
 # reference period
 temp_mean <- apply(temp4, c(1,2), mean) # global mean for entire period
@@ -77,6 +91,20 @@ prec_sd <- apply(prec4, c(1,2), sd)
 # composites and difference to reference period
 prec_comp_nino <- apply(prec4[,,selnino], c(1,2), mean)
 diff_prec_nino <- prec_comp_nino - prec_mean
+
+
+# El nino index ----------------------
+
+# lon lat indices
+nino_34_lon <- which(lon > -170 & lon < -120)
+nino_34_lat <- which(lat > -5 & lat < 5)
+
+# annual mean temp value for nino 3.4 region
+# maybe use different months?
+temp_nino_34 <- apply(temp3[nino_34_lon,nino_34_lat,,1:12], c(1:3), mean)
+
+
+temp_nino_34
 
 
 # PLOTS --------------------------------------
@@ -194,19 +222,67 @@ filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,a
 
 # COMPOSITES TIMESERIES --------------------------------
 
+# version 1 -----------------------
 
 # Erstellen der Timeseries aus Mittelwerten für australien 
 # Range der Koordinaten:
 # S -30.52     -     -19.109
 # E 123.11     -      142.34
-l = lat >= -30.52 & lat <= -19.109
-b = lon >= 123.11 & lon <= 142.34
+l <-  lat >= -30.52 & lat <= -19.109
+b <-  lon >= 123.11 & lon <= 142.34
 
-prec_time = data.frame(prec = apply(prec4[b,l,], 3, mean),
-                       time = 1421:2008)
-plot(prec_time$time,prec_time$prec, type="l")
 
-ElNino <- sort(ElNino)
+# precip and precip difference (split in 1800)
+df_prec_time <-  tibble(yr = 1421:2008,
+                     prec = apply(prec4[b,l,], 3, mean),
+                     prec_diff_1800 = prec - mean(prec[selyrs_1800]),
+                     prec_diff_2008 = prec - mean(prec[selyrs_2008])
+                     )
+
+
+# make df of composites
+df_prec_comp <- tibble()
+compyrs <- c(-2:5) # years for the analysis
+
+# add the years before 1800
+for (i in selnino1800) {
+  comp_indices <- compyrs + i # indices for the years before and after the event
+  
+  # calculate composites
+  composite_df <- tibble(yr = c(-2:5), # comp years
+                         nino_yr = yrs[i], # el nino event
+                         comps = df_prec_time$prec_diff_1800[comp_indices],  # precip values
+                         period = "before 1800")
+  
+  # add to complete dataframe
+  df_prec_comp <- rbind(df_prec_comp, composite_df)
+}
+
+# add the years after 1800
+for (i in selnino2008) {
+  comp_indices <- compyrs + i # indices for the years before and after the event
+  
+  # calculate composites
+  composite_df <- tibble(yr = c(-2:5), # comp years
+                         nino_yr = yrs[i], # el nino event
+                         comps = df_prec_time$prec_diff_2008[comp_indices],  # precip values
+                         period = "after 1800")
+  
+  # add to complete dataframe
+  df_prec_comp <- rbind(df_prec_comp, composite_df)
+}
+
+# if we want the color in the plot to be discrete
+# df_prec_comp$nino_yr <- factor(df_prec_comp$nino_yr, levels = ElNino$yr)
+df_prec_comp$period <- factor(df_prec_comp$period, levels = c("before 1800", "after 1800")) # sorts the facet wrap
+
+# plot
+ggplot(df_prec_comp, aes(x=yr, y=comps, group=nino_yr, color=nino_yr)) + # line plot by nino event
+  geom_line() +
+  facet_wrap(~period) # distinguish period
+
+# version 2 ------------------------
+
 time_cuts = data.frame("1425" = rep(NA,3),
                        "1485" = rep(NA,3),
                        "1610" = rep(NA,3),
