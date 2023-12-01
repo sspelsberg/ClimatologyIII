@@ -8,6 +8,7 @@ library(RColorBrewer)
 library(paletteer)
 library(tidyverse)
 library(ggplot2)
+library(stats)
 
 # To Dos ----------------------------
 
@@ -26,6 +27,8 @@ f2 <- nc_open("../data_raw/ModE-RA_ensmean_totprec_abs_1420-2009.nc")
 LaNina <- read.table("../data_raw/LaNinaYears.txt", header = T)
 ElNino <- read.table("../data_raw/ElNinoYears.txt", header = T)
 
+# compute selection indices etc. ----------------------
+
 # read dimensions
 time <- f1$dim[[1]]$vals
 lon <- f1$dim[[2]]$vals
@@ -43,6 +46,8 @@ LaNina <- LaNina |> arrange(yr)
 yrs <- c(1421:2008)
 selyrs_1800 <- which(yrs < 1800)
 selyrs_2008 <- which(yrs >= 1800) # indices
+selyrs_1850 <- which(yrs >= 1850) # skip period with few measurements
+selyrs_1800_1850 <- which(yrs >= 1800 & yrs < 1850)
 
 # select el nino/la nina indices
 selnino <- match(ElNino$yr,yrs)
@@ -50,7 +55,7 @@ selnina <- match(LaNina$yr,yrs)
 selnino1800 <- selnino[selnino %in% selyrs_1800]
 selnino2008 <- selnino[selnino %in% selyrs_2008]
 
-
+append(selyrs_1800, c(380:395))
 
 # temp composites -------------------------
 
@@ -97,9 +102,11 @@ diff_prec_nino <- prec_comp_nino - prec_mean
 
 # El nino index ----------------------
 
-# 1)standardize after 1850
+# 1) standardize after 1850
 # 2) look at what sd corresponds to modern elnino threshhold 
 # 3) apply that sd threshhold to time before 1800 to define el nino
+# official NOAA index: 30 years base period (implemented), 
+# 3 months running mean +/- 0.5 °C for at least 5 consecutive months = el Nino
 
 # lon lat indices
 nino_34_lon <- which(lon > -170 & lon < -120)
@@ -111,15 +118,54 @@ temp_nino_34 <- apply(temp3[nino_34_lon,nino_34_lat,,1:12], 3, mean) # in K
 temp_nino_34 <- tibble(yr = yrs,
                        nino34 = temp_nino_34)
 
+# overall mean temp
 mean_nino_34_1800 <- mean(temp_nino_34$nino34[selyrs_1800])
 mean_nino_34_2008 <- mean(temp_nino_34$nino34[selyrs_2008])
+mean_nino_34_1850 <- mean(temp_nino_34$nino34[selyrs_1850])
+mean_nino_34_1800_1850 <- mean(temp_nino_34$nino34[selyrs_1800_1850])
 
-ggplot(temp_nino_34, aes(yr, nino34)) +
-  geom_line() +
+# standardized data for 1421-1800, 1800-1850, 1850-2008
+std_nino_34_1800 <- (temp_nino_34$nino34[selyrs_1800] - mean_nino_34_1800) / sd(temp_nino_34$nino34[selyrs_1800])
+std_nino_34_1800_1850 <- (temp_nino_34$nino34[selyrs_1800_1850] - mean_nino_34_1800_1850) / sd(temp_nino_34$nino34[selyrs_1800_1850])
+std_nino_34_1850 <- (temp_nino_34$nino34[selyrs_1850] - mean_nino_34_1850) / sd(temp_nino_34$nino34[selyrs_1850])
+
+# compute threshhold for el nino events after 1850 --> el nino event = 0.905 sigma
+nino_threshhold <- 0.5 / sd(temp_nino_34$nino34[selyrs_1850])
+
+# add standardized column to dataframe
+temp_nino_34$std = append(std_nino_34_1800, append(std_nino_34_1800_1850, std_nino_34_1850))
+
+# calculate a moving average for a given number of years
+moving_average <- function(vals, years = 30){
+  return(stats::filter(vals, rep(1/years, years), sides = 2))
+}
+
+# compute running means
+temp_nino_34$moving_average = moving_average(temp_nino_34$nino34)
+temp_nino_34$moving_average_std = moving_average(temp_nino_34$std)
+
+# compute residuals of std data
+temp_nino_34$res_std = temp_nino_34$std - temp_nino_34$moving_average_std 
+
+
+# plot original data with moving average
+ggplot(temp_nino_34, aes(x=yr)) +
+  geom_line(aes(y=nino34)) +
+  geom_line(aes(y=moving_average)) +
   geom_segment(aes(x = 1421, xend = 1800, y = mean_nino_34_1800, yend = mean_nino_34_1800), color="red") +
   geom_segment(aes(x = 1800, xend = 2008, y = mean_nino_34_2008, yend = mean_nino_34_2008), color="blue")
 
+# plot standardized data
+ggplot(temp_nino_34, aes(x=yr)) +
+  geom_line(aes(y=std)) +
+  geom_line(aes(y=moving_average_std))
 
+# plot residuals (data - moving average)
+ggplot(temp_nino_34, aes(x=yr, y=res_std)) +
+  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = nino_threshhold, linetype="dashed", color = "red") +
+  geom_hline(yintercept = -nino_threshhold, linetype="dashed", color = "blue") +
+  geom_line()
 
 # PLOTS --------------------------------------
 
