@@ -101,10 +101,18 @@ nino_34_lat <- which(lat > -5 & lat < 5)
 
 # annual mean temp value for nino 3.4 region
 # maybe use different months?
-temp_nino_34 <- apply(temp3[nino_34_lon,nino_34_lat,,1:12], c(1:3), mean)
+temp_nino_34 <- apply(temp3[nino_34_lon,nino_34_lat,,1:12], 3, mean) # in K
+temp_nino_34 <- tibble(yr = yrs,
+                       nino34 = temp_nino_34)
 
+mean_nino_34_1800 <- mean(temp_nino_34$nino34[selyrs_1800])
+mean_nino_34_2008 <- mean(temp_nino_34$nino34[selyrs_2008])
 
-temp_nino_34
+ggplot(temp_nino_34, aes(yr, nino34)) +
+  geom_line() +
+  geom_segment(aes(x = 1421, xend = 1800, y = mean_nino_34_1800, yend = mean_nino_34_1800), color="red") +
+  geom_segment(aes(x = 1800, xend = 2008, y = mean_nino_34_2008, yend = mean_nino_34_2008), color="blue")
+
 
 
 # PLOTS --------------------------------------
