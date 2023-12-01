@@ -79,6 +79,8 @@ prec <- ncvar_get(f2, varid="totprec")
 prec2 <- array(prec, dim=c(length(lon), length(lat), 12, length(time)/12))
 prec3 <- aperm(prec2, c(1,2,4,3)) # UNIT kg/m^2 s
 
+min(prec2) # ignore negative values when looking at absolutes, they make sense when looking at deviation
+
 # compute precip sum for each year
 # convert to kg/m^2 per year --> *60*60*24*365
 prec4 <- apply(prec3,c(1:3), mean)
@@ -94,6 +96,10 @@ diff_prec_nino <- prec_comp_nino - prec_mean
 
 
 # El nino index ----------------------
+
+# 1)standardize after 1850
+# 2) look at what sd corresponds to modern elnino threshhold 
+# 3) apply that sd threshhold to time before 1800 to define el nino
 
 # lon lat indices
 nino_34_lon <- which(lon > -170 & lon < -120)
