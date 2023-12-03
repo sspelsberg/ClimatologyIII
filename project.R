@@ -13,8 +13,8 @@ library(stats)
 # To Dos ----------------------------
 
 # 1) crop composite map to australia to visualize local precipitation effects 
-# 2) calculate own el nino index
-# 3) use other months for analysis
+# 2) calculate own el nino index (done?)
+# 3) use other months for analysis 
 
 # 4) figure out why there are 
 # --> negative precip values -> because of the moving average
@@ -35,11 +35,11 @@ lon <- f1$dim[[2]]$vals
 lat <- f1$dim[[3]]$vals
 
 # change colnames to something writeable
-# colnames(ElNino) <- "yr" we have our own series now
+# colnames(ElNino) <- "yr" ;we have our own series now
 colnames(LaNina) <- "yr"
 
 # sort El Nino
-# ElNino <- ElNino$year |> arrange(yr) we have our own series now
+# ElNino <- ElNino$year |> arrange(yr); we have our own series now
 ElNino <- data.frame(yr = as.numeric(ElNino$year))
 LaNina <- LaNina |> arrange(yr)
 
@@ -244,59 +244,117 @@ dlat <- lat[1]-lat[2]
 sellon <- (lon<(clon+(dlon/2)))&(lon>=(clon-(dlon/2)))
 sellat <- (lat<(clat+(dlat/2)))&(lat>=(clat-(dlat/2)))
 
-# timeseries average precip at those gridcells
-ausie <- prec4[sellon,sellat,]
 
-# format 2 plots
+
+# timeseries average precip at those gridcells BEFORE 1800
+ausie <- prec4[sellon,sellat,selyrs_1800]
+
 par(mfrow=c(1,2))
 
-plotfield <- apply(temp4,c(1,2),cor,ausie)
+plotfield <- apply(temp4[,,selyrs_1800],c(1,2),cor,ausie)
 
 x <- lon
 y <- rev(lat)
 z <- plotfield[,rev(1:length(lat))]
 
-png("./plots/correlation_prec_australia_global_temp.png", width = 1000, height=700)
+png("./plots/correlation_prec_australia_global_temp_1800.png", width = 1000, height=700)
+
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (1800)")
+
+dev.off()
+
+# timeseries average precip at those gridcells AFTER 1800
+ausie <- prec4[sellon,sellat,selyrs_2008]
+
+par(mfrow=c(1,2))
+
+plotfield <- apply(temp4[,,selyrs_2008],c(1,2),cor,ausie)
+
+z <- plotfield[,rev(1:length(lat))]
+
+png("./plots/correlation_prec_australia_global_temp_2008.png", width = 1000, height=700)
+
+mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
+mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (2008)")
+
 dev.off()
 
 
 
-
-# correlation of average Elnino temperature with precipitation in Australia
-# !only comparison of intensities of el nino
-yr.jfm <- c(1421:2008)
-selnino <- match(ElNino$yr,yr.jfm) # indices of the years
-ausie <- prec4[sellon,sellat,selnino]
+# correlation of Elnino intensity with average precipitation in Australia BEFORE 1800
+# get prec in el nino years for that grid cell
+ausie <- prec4[sellon,sellat,selnino[selnino<380]]
 
 par(mfrow=c(1,2))
 
-plotfield <- apply(temp4[,,selnino],c(1,2),cor,ausie) 
+plotfield <- apply(temp4[,,selnino[selnino<380]],c(1,2),cor,ausie) 
+
 z <- plotfield[,rev(1:length(lat))]
+
+png("./plots/correlation_prec_australia_ElNinointensity_1800.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature for ElNino years")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
 
+dev.off()
 
+# correlation of Elnino intensity with average precipitation in Australia AFTER 1800
+# get prec in el nino years for that grid cell
+ausie <- prec4[sellon,sellat,selnino[selnino>=380]]
 
-# correlation of average LaNina temperature vs precipitation in Australia
-# !only comparison of intensities of la nina
+par(mfrow=c(1,2))
 
-selnina <- match(LaNina,yr.jfm)                     
-ausie <- prec4[sellon,sellat,selnina]
-plotfield <- apply(temp4[,,selnina],c(1,2),cor,ausie)
+plotfield <- apply(temp4[,,selnino[selnino>=380]],c(1,2),cor,ausie) 
 
-
-y <- rev(lat)
 z <- plotfield[,rev(1:length(lat))]
+
+png("./plots/correlation_prec_australia_ElNinointensity_2008.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature for LaNina years")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
 
+dev.off()
+
+
+
+# correlation of LaNina intensity vs precipitation in Australia BFORE 1800
+ausie <- prec4[sellon,sellat,selnina[selnina<380]]
+
+par(mfrow=c(1,2))
+
+plotfield <- apply(temp4[,,selnina[selnina<380]],c(1,2),cor,ausie)
+
+z <- plotfield[,rev(1:length(lat))]
+
+png("./plots/correlation_prec_australia_LaNinaintensity_1800.png", width = 1000, height=700)
+
+mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
+mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+
+dev.off()
+
+
+
+# correlation of LaNina intensity vs precipitation in Australia AFTER 1800
+ausie <- prec4[sellon,sellat,selnina[selnina>=380]]
+
+plotfield <- apply(temp4[,,selnina[selnina>=380]],c(1,2),cor,ausie)
+
+z <- plotfield[,rev(1:length(lat))]
+
+png("./plots/correlation_prec_australia_LaNinaintensity_2008.png", width = 1000, height=700)
+
+mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
+mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+
+dev.off()
 
 # COMPOSITES TIMESERIES --------------------------------
 
