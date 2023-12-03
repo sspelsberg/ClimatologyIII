@@ -12,13 +12,13 @@ library(stats)
 
 # To Dos ----------------------------
 
-# 1) crop composite map to australia to visualize local precipitation effects
+# 1) crop composite map to australia to visualize local precipitation effects 
 # 2) calculate own el nino index
 # 3) use other months for analysis
 
 # 4) figure out why there are 
-# --> negative precip values
-# --> mean temp values >300
+# --> negative precip values -> because of the moving average
+# --> mean temp values >300  -> because unit is Kelvin
 
 
 # read data -----------------------------------
@@ -149,68 +149,84 @@ temp_nino_34$res_std = temp_nino_34$std - temp_nino_34$moving_average_std
 
 
 # plot original data with moving average
+png("./plots/temp_nino34_movingaverage.png", width = 1000, height=700)
 ggplot(temp_nino_34, aes(x=yr)) +
   geom_line(aes(y=nino34)) +
   geom_line(aes(y=moving_average)) +
   geom_segment(aes(x = 1421, xend = 1800, y = mean_nino_34_1800, yend = mean_nino_34_1800), color="red") +
   geom_segment(aes(x = 1800, xend = 2008, y = mean_nino_34_2008, yend = mean_nino_34_2008), color="blue")
+dev.off()
 
 # plot standardized data
+png("./plots/temp_nino34_stand_data.png", width = 1000, height=700)
 ggplot(temp_nino_34, aes(x=yr)) +
   geom_line(aes(y=std)) +
   geom_line(aes(y=moving_average_std))
+dev.off()
 
 # plot residuals (data - moving average)
+png("./plots/temp_nino34_residuals.png", width = 1000, height=700)
 ggplot(temp_nino_34, aes(x=yr, y=res_std)) +
   geom_hline(yintercept = 0) +
   geom_hline(yintercept = nino_threshhold, linetype="dashed", color = "red") +
   geom_hline(yintercept = -nino_threshhold, linetype="dashed", color = "blue") +
   geom_line()
+dev.off()
 
 # PLOTS --------------------------------------
 
 # Cropping of Map function
 # careful - if done before analysis, analysis only looks at chosen area, 
 # otherwise only the map is cropped
-sellat <- which(lat<20)
-sel.lat.num <- lat[sellat]
 
-x <- lon
-y <- rev(lat)
+# latitude < -8 - -43 for only Australia
+# longitude          
+sellat <- which(lat < -8 & lat > -43 )
+sellon <- which(lon < 157 & lon > 109 )
+
+x <- lon[sellon]
+y <- rev(lat[sellat])
 
 # composites for el nino years ---------------------------
 
-z <- diff_prec_nino[,rev(1:length(lat))]
+z <- diff_prec_nino[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
 
+png("./plots/prec_composites_elninoyrs.png", width = 1000, height=700)
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
 filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Composites Precipitation El Nino years")
-
+dev.off()
 
 # annual means --------------------------
 
 # average temperature whole time period
-z <- temp_mean[,rev(1:length(lat))]
 
+z <- temp_mean[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
+
+png("./plots/temp_average_allyr.png", width = 1000, height=700)
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- seq(210, 310, 10)
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Mean T all years")## average prec
-
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Mean T all years")
+dev.off()
 
 # average precipitation whole time period
-z <- prec_mean[,rev(1:length(lat))]
 
+z <- prec_mean[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
+
+png("./plots/prec_average_allyr.png", width = 1000, height=700)
 mycol <- c("#c6dbef", "#9ecae1", "#4292c6", "#2171b5", "#08519c", "#08306b")
 mylevs <- seq(0,6000,1000)
 filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Mean yearly prec [mm]")
-
+dev.off()
 
 # sd precipitation
-z <- prec_sd[,rev(1:length(lat))]
 
+z <- prec_sd[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
+
+png("./plots/prec_sd_allyr.png", width = 1000, height=700)
 mylevs <- seq(0,600,100)
 filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Sd of yearly prec [mm]")
-
+dev.off()
 
 # correlations --------------------------------
 
@@ -227,27 +243,29 @@ dlat <- lat[1]-lat[2]
 sellon <- (lon<(clon+(dlon/2)))&(lon>=(clon-(dlon/2)))
 sellat <- (lat<(clat+(dlat/2)))&(lat>=(clat-(dlat/2)))
 
-# timeseries precip at that gridcell
+# timeseries average precip at those gridcells
 ausie <- prec4[sellon,sellat,]
-
-# ausie has negative precip values, wtf?
 
 # format 2 plots
 par(mfrow=c(1,2))
 
 plotfield <- apply(temp4,c(1,2),cor,ausie)
+
+x <- lon
+y <- rev(lat)
 z <- plotfield[,rev(1:length(lat))]
 
+png("./plots/correlation_prec_australia_global_temp.png", width = 1000, height=700)
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
 filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature")
-
+dev.off()
 
 
 
 
 # correlation of average Elnino temperature with precipitation in Australia
-# only comparison of intensities of el nino
+# !only comparison of intensities of el nino
 yr.jfm <- c(1421:2008)
 selnino <- match(ElNino$yr,yr.jfm) # indices of the years
 ausie <- prec4[sellon,sellat,selnino]
@@ -264,13 +282,12 @@ filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,a
 
 
 # correlation of average LaNina temperature vs precipitation in Australia
-# only comparison of intensities of la nina
+# !only comparison of intensities of la nina
 
 selnina <- match(LaNina,yr.jfm)                     
 ausie <- prec4[sellon,sellat,selnina]
 plotfield <- apply(temp4[,,selnina],c(1,2),cor,ausie)
-# y <- rev(sel.lat.num)
-# z <- plotfield[,rev(1:length(lat[sellat]))]
+
 
 y <- rev(lat)
 z <- plotfield[,rev(1:length(lat))]
