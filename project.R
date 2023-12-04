@@ -12,9 +12,9 @@ library(stats)
 
 # To Dos ----------------------------
 
-# 1) crop composite map to australia to visualize local precipitation effects 
-# 2) calculate own el nino index (done?)
-# 3) use other months for analysis 
+# 1) crop composite map to australia to visualize local precipitation effects (done TS)
+# 2) calculate own el nino index 
+# 3) use other months for analysis (nessecary? )
 
 # 4) figure out why there are 
 # --> negative precip values -> because of the moving average
