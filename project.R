@@ -185,8 +185,11 @@ dev.off()
 sellat <- which(lat < -8 & lat > -43 )
 sellon <- which(lon < 157 & lon > 109 )
 
-x <- lon[sellon]
-y <- rev(lat[sellat])
+sellat_map <- which(lat < -8 & lat > -43 )
+sellon_map <- which(lon < 157 & lon > 109 )
+
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
 
 # composites for el nino years ---------------------------
 
@@ -253,9 +256,9 @@ par(mfrow=c(1,2))
 
 plotfield <- apply(temp4[,,selyrs_1800],c(1,2),cor,ausie)
 
-x <- lon
-y <- rev(lat)
-z <- plotfield[,rev(1:length(lat))]
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_global_temp_1800.png", width = 1000, height=700)
 
@@ -272,7 +275,9 @@ par(mfrow=c(1,2))
 
 plotfield <- apply(temp4[,,selyrs_2008],c(1,2),cor,ausie)
 
-z <- plotfield[,rev(1:length(lat))]
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_global_temp_2008.png", width = 1000, height=700)
 
@@ -292,13 +297,16 @@ par(mfrow=c(1,2))
 
 plotfield <- apply(temp4[,,selnino[selnino<380]],c(1,2),cor,ausie) 
 
-z <- plotfield[,rev(1:length(lat))]
+
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_ElNinointensity_1800.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia 1800")
 
 dev.off()
 
@@ -310,13 +318,15 @@ par(mfrow=c(1,2))
 
 plotfield <- apply(temp4[,,selnino[selnino>=380]],c(1,2),cor,ausie) 
 
-z <- plotfield[,rev(1:length(lat))]
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_ElNinointensity_2008.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia 2008")
 
 dev.off()
 
@@ -329,13 +339,15 @@ par(mfrow=c(1,2))
 
 plotfield <- apply(temp4[,,selnina[selnina<380]],c(1,2),cor,ausie)
 
-z <- plotfield[,rev(1:length(lat))]
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_LaNinaintensity_1800.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia 1800")
 
 dev.off()
 
@@ -346,13 +358,15 @@ ausie <- prec4[sellon,sellat,selnina[selnina>=380]]
 
 plotfield <- apply(temp4[,,selnina[selnina>=380]],c(1,2),cor,ausie)
 
-z <- plotfield[,rev(1:length(lat))]
+x <- lon[sellon_map]
+y <- rev(lat[sellat_map])
+z <- plotfield[1:length(lon[sellon_map]),rev(1:length(lat[sellat_map]))]
 
 png("./plots/correlation_prec_australia_LaNinaintensity_2008.png", width = 1000, height=700)
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia 2008")
 
 dev.off()
 
