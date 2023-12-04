@@ -195,7 +195,7 @@ z <- diff_prec_nino[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
 png("./plots/prec_composites_elninoyrs.png", width = 1000, height=700)
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Composites Precipitation El Nino years")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Composites Precipitation El Nino years")
 dev.off()
 
 # annual means --------------------------
@@ -207,7 +207,7 @@ z <- temp_mean[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
 png("./plots/temp_average_allyr.png", width = 1000, height=700)
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- seq(210, 310, 10)
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Mean T all years")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main="Mean T all years")
 dev.off()
 
 # average precipitation whole time period
@@ -217,7 +217,7 @@ z <- prec_mean[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
 png("./plots/prec_average_allyr.png", width = 1000, height=700)
 mycol <- c("#c6dbef", "#9ecae1", "#4292c6", "#2171b5", "#08519c", "#08306b")
 mylevs <- seq(0,6000,1000)
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Mean yearly prec [mm]")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main="Mean yearly prec [mm]")
 dev.off()
 
 # sd precipitation
@@ -226,7 +226,7 @@ z <- prec_sd[1:length(lon[sellon]),rev(1:length(lat[sellat]))]
 
 png("./plots/prec_sd_allyr.png", width = 1000, height=700)
 mylevs <- seq(0,600,100)
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main="Sd of yearly prec [mm]")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main="Sd of yearly prec [mm]")
 dev.off()
 
 # correlations --------------------------------
@@ -261,7 +261,7 @@ png("./plots/correlation_prec_australia_global_temp_1800.png", width = 1000, hei
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (1800)")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (1800)")
 
 dev.off()
 
@@ -278,7 +278,7 @@ png("./plots/correlation_prec_australia_global_temp_2008.png", width = 1000, hei
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (2008)")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor of prec in Australia with world temperature (2008)")
 
 dev.off()
 
@@ -298,7 +298,7 @@ png("./plots/correlation_prec_australia_ElNinointensity_1800.png", width = 1000,
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
 
 dev.off()
 
@@ -316,7 +316,7 @@ png("./plots/correlation_prec_australia_ElNinointensity_2008.png", width = 1000,
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor ElNino intensity with prec in Australia")
 
 dev.off()
 
@@ -335,7 +335,7 @@ png("./plots/correlation_prec_australia_LaNinaintensity_1800.png", width = 1000,
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
 
 dev.off()
 
@@ -352,7 +352,7 @@ png("./plots/correlation_prec_australia_LaNinaintensity_2008.png", width = 1000,
 
 mycol <- c("blue4","blue2","cornflowerblue","cadetblue2","azure2","bisque1","burlywood1","brown1","brown3","darkred")
 mylevs <- max(max(z),abs(min(z)))*(c(0:10)-5)/5
-filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
+filled.contour(x,y,z,levels=mylevs,col=mycol,plot.axes={maps::map("world",interior=F,add=T)}, main = "Cor LaNina intensity with prec in Australia")
 
 dev.off()
 
