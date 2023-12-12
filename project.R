@@ -14,7 +14,7 @@ library(stats)
 
 # 1) crop composite map to australia to visualize local precipitation effects (done TS)
 # 2) calculate own el nino index 
-# 3) use other months for analysis (nessecary? )
+# 3) use other months for analysis -> only use months in which ElNino usually is strongest and check again for correlation
 
 # 4) figure out why there are 
 # --> negative precip values -> because of the moving average
