@@ -25,7 +25,8 @@ library(stats)
 f1 <- nc_open("../data_raw/ModE-RA_ensmean_temp2_abs_1420-2009.nc")
 f2 <- nc_open("../data_raw/ModE-RA_ensmean_totprec_abs_1420-2009.nc")
 LaNina <- read.table("../data_raw/LaNinaYears.txt", header = T)
-ElNino <- read.csv("./data/ElNino_years_sophie.csv", header = T)
+ElNino <- read.table("./data_raw/ElNinoYears.txt", header = T)
+# ElNino <- read.csv("./data/ElNino_years_sophie.csv", header = T)
 
 # compute selection indices etc. ----------------------
 
@@ -39,8 +40,8 @@ lat <- f1$dim[[3]]$vals
 colnames(LaNina) <- "yr"
 
 # sort El Nino
-# ElNino <- ElNino$year |> arrange(yr); we have our own series now
-ElNino <- data.frame(yr = as.numeric(ElNino$year))
+ElNino <- ElNino$year |> arrange(yr) 
+# ElNino <- data.frame(yr = as.numeric(ElNino$year))
 LaNina <- LaNina |> arrange(yr)
 
 # select years 1800-2000
@@ -435,9 +436,9 @@ dev.off()
 
 
 # save Sophies ElNino yrs in csv for above analysis
-timeseries_elnino <- data.frame(index = 1:length(unique(df_prec_comp$nino_yr)),
-                                year = unique(df_prec_comp$nino_yr))
-write.csv(timeseries_elnino, "./data/ElNino_years_sophie.csv")
+# timeseries_elnino <- data.frame(index = 1:length(unique(df_prec_comp$nino_yr)),
+#                                 year = unique(df_prec_comp$nino_yr))
+# write.csv(timeseries_elnino, "./data/ElNino_years_sophie.csv")
 
 
 
